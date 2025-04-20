@@ -1,0 +1,32 @@
+/* Add these lines at the top */
+html, body, #app {
+  height: 100%;
+  margin: 0; /* Ensure no default margins interfere */
+  padding: 0; /* Ensure no default padding interferes */
+}
+
+/* Make sure #app can grow */
+#app {
+  min-height: 100%; 
+  display: flex; /* Often helpful for nested flex layouts */
+  flex-direction: column; /* If App is structured vertically */
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Ensure Poppins font is applied globally */
+body {
+  font-family: 'Poppins', sans-serif;
+}

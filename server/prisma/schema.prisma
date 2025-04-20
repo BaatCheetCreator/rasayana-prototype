@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Matches your database choice
+  url      = env("DATABASE_URL") // Loads the connection URL from .env file
+}
+
+
+// ---------- DATABASE MODELS ----------
+
+model MenuItem {
+  id            String   @id @default(cuid()) // Unique ID
+  name          String   @unique              // e.g., "Ragi Vegetable Chilla"
+  description   String?                       // Optional description
+  price         Int                           // Price in paise (e.g., 12000 for ₹120.00)
+  
+  // --- Categorization & Filtering Fields ---
+  category      String                        // "Breakfast", "Lunch & Dinner", "Snack", "Dessert", "Beverage"
+  cuisineRegion String?                       // "North Indian", "South Indian", "Bengali", "Odia", etc.
+  mealType      String?                       // "Chilla", "Idli", "Thali", "Curry", "Khichdi", "Biryani", etc.
+  dietType      String                        // "With Onion/Garlic", "Without Onion/Garlic" 
+                                              // Consider Boolean `hasOnionGarlic` if only two options exist
+  isVeg         Boolean  @default(true)       // Assuming all are veg based on plan
+
+  // --- Nutritional Information ---
+  calories        Int?
+  protein         Float? // Grams
+  carbs           Float? // Grams
+  fat             Float? // Grams
+  fiber           Float? // Grams
+  glycemicIndex   String?  // "Low", "Medium", "High"
+  
+  // --- Flags based on Nutrition (derived from above or manually set) ---
+  isHighProtein   Boolean  @default(false) // e.g., >= 12g ? true : false (based on 💪 symbol)
+  isHighFiber     Boolean  @default(false) // e.g., >= 7g ? true : false (based on 🌿 symbol)
+  isHeartHealthy  Boolean  @default(false) // Based on low sat fat/sodium (💚 symbol)
+
+  // --- Display & Ordering ---
+  imageUrl        String?                       // Placeholder or actual URL
+  isFeatured      Boolean  @default(false)      // For homepage display
+  standardIngredients String?                   // Simple text list for now, can be relation later
+  
+  // --- Timestamps ---
+  createdAt       DateTime @default(now())      // Auto-set on creation
+  updatedAt       DateTime @updatedAt           // Auto-set on update
+
+  // --- Future Relationships (Uncomment and define models later) ---
+  // customizationOptions CustomizationOption[] // Link to available customizations
+  // accompaniments       Accompaniment[]       // Link to recommended sides
+  // orderItems           OrderItem[]           // Link to order line items
+}
+
+
+// --- Example Future Models (Keep commented out for now) ---
+
+// model User {
+//   id          String   @id @default(cuid())
+//   email       String   @unique
+//   phone       String?  @unique // Consider adding phone
+//   name        String?
+//   password    String   // Remember to hash passwords!
+//   addresses   Address[] // Relation to Address model
+//   orders      Order[]  // Relation to Order model
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
+// }
+
+// model Address {
+//   id        String   @id @default(cuid())
+//   userId    String
+//   user      User     @relation(fields: [userId], references: [id])
+//   label     String   // e.g., "Home", "Work"
+//   line1     String
+//   line2     String?
+//   city      String
+//   state     String
+//   pincode   String
+//   isDefault Boolean  @default(false)
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+// model Order {
+//   id              String      @id @default(cuid())
+//   orderNumber     String      @unique // Custom order identifier
+//   userId          String
+//   user            User        @relation(fields: [userId], references: [id])
+//   orderItems      OrderItem[] // Relation to OrderItem model
+//   deliveryAddress Json        // Store snapshot of delivery address
+//   totalAmount     Int         // Total in paise
+//   subtotal        Int
+//   deliveryFee     Int
+//   taxes           Int
+//   discount        Int         @default(0)
+//   paymentMethod   String      // "ONLINE", "COD"
+//   paymentStatus   String      // "PENDING", "PAID", "FAILED"
+//   orderStatus     String      // "PENDING", "CONFIRMED", "PREPARING", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED"
+//   createdAt       DateTime    @default(now())
+//   updatedAt       DateTime    @updatedAt
+// }
+
+// model OrderItem {
+//   id              String   @id @default(cuid())
+//   orderId         String
+//   order           Order    @relation(fields: [orderId], references: [id])
+//   menuItemId      String
+//   menuItem        MenuItem @relation(fields: [menuItemId], references: [id]) // Link to specific menu item
+//   menuItemSnapshot Json    // Store name, price etc. at time of order
+//   quantity        Int
+//   pricePerItem    Int      // Price per item at the time of order
+//   customizations  Json?    // Store selected customizations
+// }
